@@ -12,8 +12,16 @@ return (
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  text: { fontSize: 24, fontWeight: 'bold' }
+  container: {
+    flex: 1,
+    backgroundColor: '#4D55CC',
+    justifyContent: 'center', 
+    alignItems: 'center' 
+  },
+  text: {
+    color: '#fff',
+    fontSize: 24, 
+    fontWeight: 'bold' }
 });
 
 export default UploadScreen;

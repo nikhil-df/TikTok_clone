@@ -29,23 +29,26 @@ function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'gray',
+    backgroundColor: '#211C84',
      flex: 1, 
      justifyContent: 'center', 
      alignItems: 'center' 
     },
   text: { 
+    color: '#fff',
     fontSize: 24, 
     paddingLeft: 10,
     fontWeight: 'bold' 
   },
   button: {
     flexDirection: 'row',
-    backgroundColor: 'white',
+    backgroundColor: '#4D55CC',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    borderWidth: 3,
+    borderColor: '#B5A8D5',
   },
   image: {
     width: 40,

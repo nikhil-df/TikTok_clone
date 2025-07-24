@@ -1,16 +1,17 @@
 import React, { useState } from 'react';
-import { Text, StyleSheet, TextInput, TouchableOpacity, Alert, Image, PermissionsAndroid, Platform, ScrollView } from 'react-native';
+import { Text, StyleSheet, TextInput, TouchableOpacity, Alert, Image, PermissionsAndroid, Platform, ScrollView, View } from 'react-native';
 import { launchImageLibrary, ImageLibraryOptions } from 'react-native-image-picker';
 import RNFS from 'react-native-fs';
 import firestore from '@react-native-firebase/firestore';
 import auth from '@react-native-firebase/auth';
 import { useNavigation } from '@react-navigation/native';
+import { triggerAppReload } from '../App';
 
 
 function UserRegistration() {
   const [name, setName] = useState<string>('');
   const [image, setImage] = useState<string | undefined>();
-  const navigation = useNavigation<any>();
+
 
   const handleRegistration = async () => {
     if (!name.trim() || !image) {
@@ -31,10 +32,7 @@ function UserRegistration() {
       Alert.alert('Success', 'User registered successfully');
       setName('');
       setImage(undefined);
-       navigation.reset({
-        index: 0,
-        routes: [{ name: 'Home'}],
-      });
+      triggerAppReload();
     } catch (error) {
       Alert.alert('Error', 'Failed to register user. Please try again');
       console.error(error);
@@ -70,9 +68,7 @@ function UserRegistration() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.text}>User Registration Screen</Text>
-
+    <View style={styles.container}>
       <TouchableOpacity onPress={selectImage} style={{ marginTop: 20 }}>
         <Image
           source={
@@ -87,37 +83,42 @@ function UserRegistration() {
       <TextInput
         style={styles.textInput}
         placeholder="Enter your name"
+        placeholderTextColor="#fff"
         value={name}
         onChangeText={(text) => setName(text)}
       />
 
       <TouchableOpacity onPress={handleRegistration} style={styles.button}>
-        <Text style={{ color: '#fff' }}>Submit</Text>
+        <Text style={styles.text}>Submit</Text>
       </TouchableOpacity>
-    </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: '#4D55CC',
+    paddingTop: 180,
     flexGrow: 1,
     alignItems: 'center',
-    padding: 20,
+    paddingHorizontal: 40,
   },
   text: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    color: '#000',
+    fontSize: 20,
+    fontWeight: 'medium',
   },
   textInput: {
     height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginVertical: 10,
+    borderColor: '#B5A8D5',
+    color: '#fff',
+    borderRadius: 8,
+    borderWidth: 1.5,
     width: '100%',
     paddingHorizontal: 10,
   },
   button: {
-    backgroundColor: '#007BFF',
+    backgroundColor: '#f4f4f4',
     padding: 10,
     borderRadius: 5,
     alignItems: 'center',
@@ -128,7 +129,11 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    marginTop: 10,
+    marginBottom: 25,
+    borderWidth: 3,
+    borderColor: '#B5A8D5',
+    shadowOffset: { width: 0, height: 2 },
+    shadowColor: 'rgba(0, 0, 0, 0.3)',
   },
 });
 

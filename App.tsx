@@ -6,23 +6,24 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
-import MaterialIcon from 'react-native-vector-icons/MaterialIcons';
+import LottieView from 'lottie-react-native';
 import firestore from '@react-native-firebase/firestore';
 import LoginScreen from "./screens/login_screen";
 import UserRegistration from "./screens/user_registration";
-import HomeScreen from "./screens/home_screen";
-import UploadScreen from "./screens/upload_screen";
-import DiscoverScreen from "./screens/discover_screen";
-import ProfileScreen from "./screens/profile_screen";
-import NotificationsScreen from './screens/notifications_screen';
+import { ActivityIndicator, View } from 'react-native';
+import MainTabs from './screens/MainTabs';
 
 const Stack = createNativeStackNavigator();
-const Tab = createBottomTabNavigator();
+export let triggerAppReload: () => void;
 
 function App() {
   const [user, setUser] = useState<FirebaseAuthTypes.User | null>(null);
   const [profileComplete, setProfileComplete] = useState<boolean | null>(null);
-
+  const [loading, setLoading] = useState(true);
+  const [reloadVersion, setReloadVersion] = useState(0);
+  triggerAppReload = () => {
+    setReloadVersion(prev => prev + 1);
+  };
   useEffect(() => {
     GoogleSignin.configure({
       webClientId: '794647222037-3q1pqkn2279m6h2947qlnei400f6gihe.apps.googleusercontent.com',
@@ -49,69 +50,39 @@ function App() {
         setProfileComplete(null);
       }
     });
-
+    setLoading(false);
     return () => unsubscribeAuth();
-  }, []);
+  }, [reloadVersion]);
+
+  if (loading) {
+    return (
+      <View style={{ backgroundColor: '#4D55CC', flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <LottieView
+          source={require('./assets/loading/loading.json')}
+          autoPlay
+          loop
+          style={{ width: '60%', height: '60%' }}
+        />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
         <NavigationContainer>
-          {!user ? (
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Navigator screenOptions={{ headerShown: false }}>
+            {user === null ? (
               <Stack.Screen name="Login" component={LoginScreen} />
-            </Stack.Navigator>
-          ) : !profileComplete ? (
-            <Stack.Navigator screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="Profile" component={UserRegistration} />
-            </Stack.Navigator>
-          ) : (
-            <Tab.Navigator
-              screenOptions={({ route }) => ({
-                headerShown: false,
-                tabBarShowLabel: false,
-                tabBarIconStyle: { marginTop: 10 },
-                tabBarStyle: {
-                  height: 60,
-                },
-
-                tabBarIcon: ({ color, size }) => {
-                  let iconName;
-
-                  switch (route.name) {
-                    case 'Home':
-                      iconName = 'home';
-                      break;
-                    case 'Notification':
-                      iconName = 'notifications';
-                      break;
-                    case 'Upload':
-                      iconName = 'add-box';
-                      break;
-                    case 'Discover':
-                      iconName = 'explore';
-                      break;
-                    case 'Profile':
-                      iconName = 'person';
-                      break;
-                    default:
-                      iconName = 'circle';
-                  }
-
-                  return <MaterialIcon name={iconName} size={size} color={color} />;
-                },
-                tabBarActiveTintColor: '#000',
-                tabBarInactiveTintColor: 'gray',
-              })}
-            >
-              <Tab.Screen name="Home" component={HomeScreen} />
-              <Tab.Screen name="Notification" component={NotificationsScreen} />
-              <Tab.Screen name="Upload" component={UploadScreen} />
-              <Tab.Screen name="Discover" component={DiscoverScreen} />
-              <Tab.Screen name="Profile" component={ProfileScreen} />
-            </Tab.Navigator>
-          )}
+            ) : profileComplete === false ? (
+              <Stack.Screen name="UserRegistration" component={UserRegistration} />
+            ) : (
+              <Stack.Screen name="MainTabs" component={MainTabs} />
+            )}
+          </Stack.Navigator>
         </NavigationContainer>
+
+
       </SafeAreaView>
     </SafeAreaProvider>
   );
